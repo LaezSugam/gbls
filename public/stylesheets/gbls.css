@@ -28,14 +28,19 @@ body, html{
 
 #deck{
     font-size: 2em;
-    margin: 35% 5% 0%;
+    /* margin: 35% 5% 0%; */
     width: 90%;
     /* outline: 1px solid red; */
     text-align: center;
+    position: absolute;
+    bottom: 3%;
+    left: 5%;
 }
 
 #name{
-    margin: 5% 5% 0%;
     font-size: 3em;
     font-style: italic;
+    position: absolute;
+    top: 5%;
+    left: 5%;
 }

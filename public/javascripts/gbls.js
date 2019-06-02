@@ -1,35 +1,29 @@
+var data;
+var nameElement;
+
 async function setScreen(){
     var response = await fetch('/screen');
-    var data = await response.json();
-    var nameElement = document.getElementById("name");
+    data = await response.json();
+    nameElement = document.getElementById("name");
     
     console.log(data);
     console.log(data.Image);
     console.log(data.Deck);
-    document.getElementById("main").style.backgroundImage = "url('" + data.Image + "')";
-    // await animateOutLeft(nameElement);
 
-    // var pos = 0;
-    // var endWidth = -nameElement.offsetWidth;
-    // var id = await setInterval(frame, 5);
-    // var isAnimating = true;
-    // function frame(){
-    //     if(pos == endWidth){
-    //         clearInterval(id);
-    //         isAnimating = false;
-    //     }
-    //     else{
-    //         pos--;
-    //         nameElement.style.left = pos + "px";
-    //     }
-    // }
+    var currentPosition = 0;
 
-    // while(isAnimating){
-    //     //Don't do anything while the animation is going.
-    // }
+    var id = setInterval(frame, 10);
 
-    nameElement.innerHTML = data.Name + "&nbsp; <img src='../images/favicon.ico'/>";
-    document.getElementById("deck").innerHTML = data.Deck;
+    function frame(){
+        if(currentPosition == -100){
+            clearInterval(id);
+            setScreen2();
+        }
+        else{
+            currentPosition--;
+            nameElement.style.left = currentPosition + "%";
+        }
+    }
 }
 
 
@@ -43,19 +37,22 @@ async function nextScreen(){
     return setTimeout(nextScreen, 10000);
 }
 
-async function animateOutLeft(element){
-    var width = element.offsetWidth;
-    console.log(width);
+function setScreen2(){
+    document.getElementById("main").style.backgroundImage = "url('" + data.Image + "')";
+    nameElement.innerHTML = data.Name + "&nbsp; <img src='../images/favicon.ico'/>";
+    document.getElementById("deck").innerHTML = data.Deck;
 
-    var id = await setInterval(await frame(element, 0, -width, id), 5);
-}
+    var currentPosition = -100;
 
-async function frame(element, currentPosition, stopPosition, id){
-    if(currentPosition == stopPosition){
-        clearInterval(id);
-    }
-    else{
-        currentPosition--;
-        element.style.left = currentPosition + "px";
+    var id = setInterval(frame, 10);
+
+    function frame(){
+        if(currentPosition == 0){
+            clearInterval(id);
+        }
+        else{
+            currentPosition++;
+            nameElement.style.left = currentPosition + "%";
+        }
     }
 }

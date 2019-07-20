@@ -45,7 +45,10 @@ const categories = [
   new Category("object", "objects"),
   new Category("person", "people"),
   new Category("platform", "platforms"),
-  new Category("theme", "themes")
+  new Category("theme", "themes"),
+  new Category("video", "videos"),
+  // new Category("video_category", "video_categories"),
+  new Category("video_show", "video_shows")
 ]
 
 const getLoadingScreen = async () => {
@@ -82,27 +85,53 @@ const getLoadingScreen = async () => {
           
   //     })
 
-  var response = await fetch("https://www.giantbomb.com/api/" + category.Plural + "/?api_key=121aa0789ad0e36deb7c4ff3feeeb2f46f9ac6b3&format=json&limit=1");
+  var response = await fetch("https://www.giantbomb.com/api/" + category.Plural + "/?api_key=121aa0789ad0e36deb7c4ff3feeeb2f46f9ac6b3&format=json"); //limit 1 works with every category except shows, using it with shows leave total number of results at 1
   var data = await response.json();
 
+  console.log("Results: " + data.number_of_total_results);
+  
   var itemNumber = Math.floor(Math.random() * (data.number_of_total_results));
   var response2 = await fetch("https://www.giantbomb.com/api/" + category.Plural + "/?api_key=121aa0789ad0e36deb7c4ff3feeeb2f46f9ac6b3&format=json&limit=1&offset=" + itemNumber);
   var data2 = await response2.json();
   console.log(data2.results)
 
-  var imageResponse = await fetch("https://www.giantbomb.com/api/images/" + data2.results[0].guid + "/?api_key=121aa0789ad0e36deb7c4ff3feeeb2f46f9ac6b3&format=json");
-  var imageData = await imageResponse.json();
+  var imageUrl;
+  var name = data2.results[0].name;
+  var deck = data2.results[0].deck;
 
-  if(imageData.results.length < 1){
-    return getLoadingScreen();
+  if(name == null || name == undefined || name == "")
+  {
+    name = data2.results[0].title;
   }
 
-  var imageNumber = Math.floor(Math.random() * (imageData.results.length));
+  console.log("Category: " + category.Singular);
 
-  console.log(imageData.results);
-  console.log(imageData.results[imageNumber].super_url);
+  if(["video", "video_show", "video_category"].includes(category.Singular))
+  {
+    imageUrl = data2.results[0].image.super_url;
+  }
+  else
+  {
+    var imageResponse = await fetch("https://www.giantbomb.com/api/images/" + data2.results[0].guid + "/?api_key=121aa0789ad0e36deb7c4ff3feeeb2f46f9ac6b3&format=json");
+    var imageData = await imageResponse.json();
+  
+    console.log("image results: " + imageData.results.length);
+  
+    if(imageData.results.length < 1){
+      return getLoadingScreen();
+    }
+  
+    var imageNumber = Math.floor(Math.random() * (imageData.results.length));
+  
+    console.log(imageData.results);
+    console.log(imageData.results[imageNumber].super_url);
+  
+    imageUrl = imageData.results[imageNumber].super_url;
+  }
 
-  var screen = new LoadingScreen(data2.results[0].name, imageData.results[imageNumber].super_url, data2.results[0].deck);
+  var screen = new LoadingScreen(name, imageUrl, deck);
+
+ 
 
   return screen;
 }

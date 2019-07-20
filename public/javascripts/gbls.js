@@ -1,10 +1,12 @@
 var data;
 var nameElement;
+var deckElement;
 
 async function setScreen(){
     var response = await fetch('/screen');
     data = await response.json();
     nameElement = document.getElementById("name");
+    deckElement = document.getElementById("deck");
     
     console.log(data);
     console.log(data.Image);
@@ -22,6 +24,7 @@ async function setScreen(){
         else{
             currentPosition--;
             nameElement.style.left = currentPosition + "%";
+            deckElement.style.bottom = currentPosition + "%";
         }
     }
 }
@@ -40,7 +43,7 @@ async function nextScreen(){
 function setScreen2(){
     document.getElementById("main").style.backgroundImage = "url('" + data.Image + "')";
     nameElement.innerHTML = data.Name + "&nbsp; <img src='../images/favicon.ico'/>";
-    document.getElementById("deck").innerHTML = data.Deck;
+    deckElement.innerHTML = data.Deck;
 
     var currentPosition = -100;
 
@@ -53,6 +56,7 @@ function setScreen2(){
         else{
             currentPosition++;
             nameElement.style.left = currentPosition + "%";
+            deckElement.style.bottom = currentPosition + "%";
         }
     }
 }

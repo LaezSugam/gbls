@@ -2,6 +2,7 @@ body, html{
     height: 100%;
     margin: 0px;
     padding: 0px;
+    overflow: hidden;
     /* outline: 1px solid green; */
 }
 
@@ -50,4 +51,5 @@ body, html{
     top: 5%;
     left: 0%;
     padding-left: 5%;
+    max-width: 90%;
 }

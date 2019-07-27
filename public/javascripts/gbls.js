@@ -1,10 +1,59 @@
 var data;
 var nameElement;
 var deckElement;
+var dataArray = [];
+var isFillDataRunning;
+
+
+async function startLoadingScreen(){
+    fillData();
+    nextScreen();
+}
+
+async function nextScreen(){
+    await setScreen();
+
+    return setTimeout(nextScreen, 10000);
+}
+
+async function retrieveData(){
+    
+    console.log("Array length: " + dataArray.length);
+
+    if(dataArray.length <= 5 && !isFillDataRunning)
+    {
+        fillData();
+    }
+
+    if(dataArray.length > 0)
+    {
+        return dataArray.shift();
+    }
+    else
+    {
+        var response = await fetch('/screen');
+        return await response.json();
+    }
+}
+
+async function fillData(){
+
+    isFillDataRunning = true;
+    console.log("Fill data starting.")
+
+    while(dataArray.length < 10){
+        console.log("Array length: " + dataArray.length);
+        var response = await fetch('/screen');
+        var tempData = await response.json();
+        dataArray.push(tempData);
+    }
+
+    console.log("Fill data ending.")
+    isFillDataRunning = false;
+}
 
 async function setScreen(){
-    var response = await fetch('/screen');
-    data = await response.json();
+    data = await retrieveData();
     nameElement = document.getElementById("name");
     deckElement = document.getElementById("deck");
     
@@ -29,16 +78,6 @@ async function setScreen(){
     }
 }
 
-
-async function startLoadingScreen(){
-    nextScreen();
-}
-
-async function nextScreen(){
-    await setScreen();
-
-    return setTimeout(nextScreen, 10000);
-}
 
 function setScreen2(){
     document.getElementById("main").style.backgroundImage = "url('" + data.Image + "')";

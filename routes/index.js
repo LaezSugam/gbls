@@ -52,50 +52,35 @@ const categories = [
 ]
 
 const getLoadingScreen = async () => {
-  // const response = await fetch('https://www.giantbomb.com/api/characters/?api_key=121aa0789ad0e36deb7c4ff3feeeb2f46f9ac6b3&format=json&limit=1');
-  // const myJson = await response.json();
-  // // const results = await JSON.parse(myJson);
 
-  // console.log(myJson);
-  var catNumber = Math.floor(Math.random() * categories.length);
-  var category = categories[catNumber];
+  var catNumber;
+  var category;
+  var response;
 
-  // fetch("https://www.giantbomb.com/api/" + category.Plural + "/?api_key=121aa0789ad0e36deb7c4ff3feeeb2f46f9ac6b3&format=json&limit=1")
-  //     .then((response) => {
-  //         return response.json();
-  //     })
-  //     .then((data) => {
-  //         var itemNumber = Math.floor(Math.random() * (data.number_of_total_results + 1));
-
-  //         fetch("https://www.giantbomb.com/api/" + category.Plural + "/?api_key=121aa0789ad0e36deb7c4ff3feeeb2f46f9ac6b3&format=json&limit=1&offset=" + itemNumber)
-  //             .then((response2) => {
-  //                 return response2.json();
-  //             }) 
-  //             .then((data2) => {
-  //                 console.log(data2.results[0]);
-  //                 fetch("https://www.giantbomb.com/api/images/" + data2.results[0].guid + "/?api_key=121aa0789ad0e36deb7c4ff3feeeb2f46f9ac6b3&format=json")
-  //                     .then((imageResponse) => {
-  //                         return imageResponse.json();
-  //                     })
-  //                     .then((imageData) => {
-  //                         console.log(imageData.results.length);
-  //                         console.log(imageData.results);
-  //                     })
-  //             })
-          
-  //     })
-
-  var response = await fetch("https://www.giantbomb.com/api/" + category.Plural + "/?api_key=121aa0789ad0e36deb7c4ff3feeeb2f46f9ac6b3&format=json"); //limit 1 works with every category except shows, using it with shows leave total number of results at 1
+  do{
+    catNumber = Math.floor(Math.random() * categories.length);
+    category = categories[catNumber];  
+    response = await fetch("https://www.giantbomb.com/api/" + category.Plural + "/?api_key=121aa0789ad0e36deb7c4ff3feeeb2f46f9ac6b3&format=json"); //limit 1 works with every category except shows, using it with shows leave total number of results at 1
+  }
+  while (!response.ok);
+  
   var data = await response.json();
 
   console.log("Results: " + data.number_of_total_results);
   
-  var itemNumber = Math.floor(Math.random() * (data.number_of_total_results));
-  var response2 = await fetch("https://www.giantbomb.com/api/" + category.Plural + "/?api_key=121aa0789ad0e36deb7c4ff3feeeb2f46f9ac6b3&format=json&limit=1&offset=" + itemNumber);
+  var itemNumber;
+  var response2; 
+  
+  do{
+    itemNumber = Math.floor(Math.random() * (data.number_of_total_results));
+    response2 = await fetch("https://www.giantbomb.com/api/" + category.Plural + "/?api_key=121aa0789ad0e36deb7c4ff3feeeb2f46f9ac6b3&format=json&limit=1&offset=" + itemNumber);
+  }
+  while(!response2.ok);
+  
   var data2 = await response2.json();
   console.log(data2.results)
 
-  var imageUrl;
+  var imageUrl = "https://www.giantbomb.com/api/image/scale_large/3026329-gb_default-16_9.png";
   var name = data2.results[0].name;
   var deck = data2.results[0].deck;
 
@@ -104,29 +89,40 @@ const getLoadingScreen = async () => {
     name = data2.results[0].title;
   }
 
-  console.log("Category: " + category.Singular);
+  if(deck == null || deck == undefined || deck == "")
+  {
+    deck = data2.results[0].name;
+  }
 
-  if(["video", "video_show", "video_category"].includes(category.Singular))
+  if(data2.results[0].image != null)
   {
     imageUrl = data2.results[0].image.super_url;
   }
-  else
+
+  console.log("Category: " + category.Singular);
+
+  if(!["video", "video_show", "video_category"].includes(category.Singular))
   {
+
     var imageResponse = await fetch("https://www.giantbomb.com/api/images/" + data2.results[0].guid + "/?api_key=121aa0789ad0e36deb7c4ff3feeeb2f46f9ac6b3&format=json");
-    var imageData = await imageResponse.json();
+    var imageData;
+
+    if(imageResponse.ok){
+      imageData = await imageResponse.json();
   
-    console.log("image results: " + imageData.results.length);
+      console.log("image results: " + imageData.results.length);
+    
+      if(imageData.results.length > 0)
+      {
+        var imageNumber = Math.floor(Math.random() * (imageData.results.length));
   
-    if(imageData.results.length < 1){
-      return getLoadingScreen();
+        console.log(imageData.results);
+        console.log(imageData.results[imageNumber].super_url);
+      
+        imageUrl = imageData.results[imageNumber].super_url;
+      }
+  
     }
-  
-    var imageNumber = Math.floor(Math.random() * (imageData.results.length));
-  
-    console.log(imageData.results);
-    console.log(imageData.results[imageNumber].super_url);
-  
-    imageUrl = imageData.results[imageNumber].super_url;
   }
 
   var screen = new LoadingScreen(name, imageUrl, deck);

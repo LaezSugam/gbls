@@ -20,7 +20,7 @@ async function retrieveData(){
     
     console.log("Array length: " + dataArray.length);
 
-    if(dataArray.length <= 5 && !isFillDataRunning)
+    if(dataArray.length <= 10 && !isFillDataRunning)
     {
         fillData();
     }
@@ -32,7 +32,15 @@ async function retrieveData(){
     else
     {
         var response = await fetch('/screen');
-        return await response.json();
+
+        if(response.ok)
+        {
+            return await response.json();
+        }
+        else{
+            return await retrieveData();
+        }
+        
     }
 }
 
@@ -41,7 +49,7 @@ async function fillData(){
     isFillDataRunning = true;
     console.log("Fill data starting.")
 
-    while(dataArray.length < 10){
+    while(dataArray.length < 20){
         console.log("Array length: " + dataArray.length);
         var response = await fetch('/screen');
         var tempData = await response.json();

@@ -35,7 +35,16 @@ class LoadingScreenHelper{
     for(var i = 0; i < this.Categories.length; i++){
   
       var category = this.Categories[i];
-      var response = await fetch("https://www.giantbomb.com/api/" + category.Plural + "/?api_key=121aa0789ad0e36deb7c4ff3feeeb2f46f9ac6b3&format=json");
+
+      var response;
+
+      try{
+        response = await fetch("https://www.giantbomb.com/api/" + category.Plural + "/?api_key=121aa0789ad0e36deb7c4ff3feeeb2f46f9ac6b3&format=json");
+      }
+      catch{
+        i--;
+        continue;
+      }
       
       if(response.ok){
         var data = await response.json();

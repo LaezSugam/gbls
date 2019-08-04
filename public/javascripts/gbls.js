@@ -3,6 +3,7 @@ var nameElement;
 var deckElement;
 var dataArray = [];
 var isFillDataRunning;
+var currentBackground = 1;
 
 
 async function startLoadingScreen(){
@@ -14,6 +15,14 @@ async function nextScreen(){
     await setScreen();
 
     return setTimeout(nextScreen, 10000);
+}
+
+function getNextImage(){
+    if(dataArray.length > 0){
+        return dataArray[0].Image;
+    }
+
+    return "";
 }
 
 async function retrieveData(){
@@ -31,7 +40,14 @@ async function retrieveData(){
     }
     else
     {
-        var response = await fetch('/screen');
+        var response;
+
+        try{
+            response = await fetch('/screen');
+        }
+        catch{
+            return await retrieveData();
+        }
 
         if(response.ok)
         {
@@ -86,9 +102,48 @@ async function setScreen(){
     }
 }
 
-
 function setScreen2(){
-    document.getElementById("main").style.backgroundImage = "url('" + data.Image + "')";
+
+    var displayedBackground;
+    var nextBackground;
+
+    if(currentBackground == 1){
+        displayedBackground = document.getElementById("background1");
+        nextBackground = document.getElementById("background2");
+        currentBackground = 2;
+    }
+    else
+    {
+        displayedBackground = document.getElementById("background2");
+        nextBackground = document.getElementById("background1");
+        currentBackground = 1;
+    }
+
+    nextBackground.style.backgroundImage = "url('" + data.Image + "')";
+    nextBackground.style.opacity = 1;
+
+    var currentOpacity = 100;
+
+    var id = setInterval(frame, 10);
+
+    function frame(){
+        if(currentOpacity == 0){
+            clearInterval(id);
+            displayedBackground.style.zIndex = -2;
+            nextBackground.style.zIndex = -1;
+            var nextImage = getNextImage();
+            displayedBackground.style.backgroundImage = "url('" + nextImage + "')";
+            setScreen3();
+        }
+        else{
+            currentOpacity--;
+            displayedBackground.style.opacity = currentOpacity * .01;
+        }
+    }
+}
+
+
+function setScreen3(){
     nameElement.innerHTML = data.Name + "&nbsp; <img src='../images/favicon.ico'/>";
     deckElement.innerHTML = data.Deck;
 

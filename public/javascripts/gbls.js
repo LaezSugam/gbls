@@ -4,6 +4,7 @@ var deckElement;
 var dataArray = [];
 var isFillDataRunning;
 var currentBackground = 1;
+var intervalId;
 
 
 async function startLoadingScreen(){
@@ -76,6 +77,11 @@ async function fillData(){
     isFillDataRunning = false;
 }
 
+async function clickSetScreen(){
+    clearInterval(intervalId);
+    setScreen();
+}
+
 async function setScreen(){
     data = await retrieveData();
     nameElement = document.getElementById("name");
@@ -87,11 +93,11 @@ async function setScreen(){
 
     var currentPosition = 0;
 
-    var id = setInterval(frame, 10);
+    intervalId = setInterval(frame, 10);
 
     function frame(){
         if(currentPosition == -100){
-            clearInterval(id);
+            clearInterval(intervalId);
             setScreen2();
         }
         else{
@@ -124,11 +130,11 @@ function setScreen2(){
 
     var currentOpacity = 100;
 
-    var id = setInterval(frame, 10);
+    intervalId = setInterval(frame, 10);
 
     function frame(){
         if(currentOpacity == 0){
-            clearInterval(id);
+            clearInterval(intervalId);
             displayedBackground.style.zIndex = -2;
             nextBackground.style.zIndex = -1;
             var nextImage = getNextImage();
@@ -149,11 +155,11 @@ function setScreen3(){
 
     var currentPosition = -100;
 
-    var id = setInterval(frame, 10);
+    intervalId = setInterval(frame, 10);
 
     function frame(){
         if(currentPosition == 0){
-            clearInterval(id);
+            clearInterval(intervalId);
         }
         else{
             currentPosition++;
